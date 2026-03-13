@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FORGE – 5-Day Strength</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: #0D0D0D; color: #F5F0E8;
+    font-family: 'DM Sans', sans-serif;
+    max-width: 480px; margin: 0 auto; min-height: 100vh;
+  }
+  .header {
+    padding: 28px 24px 16px; border-bottom: 1px solid #1E1E1E;
+    display: flex; justify-content: space-between; align-items: flex-end;
+  }
+  .logo { font-family: 'Playfair Display', serif; font-size: 30px; letter-spacing: 6px; transition: color 0.3s; }
+  .tagline { font-size: 10px; color: #555; letter-spacing: 3px; margin-top: 3px; }
+  .streak-num { font-size: 22px; font-weight: 700; text-align: right; }
+  .streak-label { font-size: 10px; color: #555; letter-spacing: 1px; }
+  .section { padding: 16px 24px 0; }
+  .row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .label { font-size: 11px; color: #555; letter-spacing: 1px; }
+  .progress-bar { height: 3px; background: #1A1A1A; border-radius: 2px; }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+  .day-selector { display: flex; padding: 20px 24px 0; gap: 8px; }
+  .day-btn {
+    flex: 1; padding: 10px 0; border: none; cursor: pointer;
+    background: #1A1A1A; border-radius: 8px; color: #444;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .day-check { font-size: 8px; margin-top: 2px; }
+  .day-header { padding: 24px 24px 12px; }
+  .day-focus { font-family: 'Playfair Display', serif; font-size: 24px; transition: color 0.3s; }
+  .day-tag { font-size: 12px; color: #555; margin-top: 3px; }
+  .pct { font-size: 20px; font-weight: 700; }
+  .pct-label { font-size: 10px; color: #555; letter-spacing: 1px; }
+  .exercises { padding: 0 24px 100px; }
+  .exercise-card {
+    background: #111; border: 1px solid #1E1E1E;
+    border-radius: 12px; margin-bottom: 12px; overflow: hidden;
+  }
+  .ex-header { padding: 14px 16px 10px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .ex-name { font-size: 14px; font-weight: 600; }
+  .ex-meta { font-size: 11px; color: #555; margin-top: 3px; }
+  .ex-count { font-size: 11px; font-weight: 700; }
+  .sets-row { display: flex; gap: 6px; padding: 0 16px 14px; }
+  .set-btn {
+    width: 38px; height: 38px; border-radius: 8px;
+    border: 1px solid #2A2A2A; background: #1A1A1A;
+    color: #333; font-size: 11px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  }
+  .set-btn.done { border: none; color: #fff; }
+  .complete-btn {
+    width: 100%; padding: 16px; border: none; border-radius: 12px;
+    color: #fff; font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    cursor: pointer; margin-top: 8px; font-family: 'DM Sans', sans-serif;
+    transition: opacity 0.2s;
+  }
+  .complete-btn:active { opacity: 0.8; }
+  .session-done {
+    text-align: center; padding: 16px; background: #111;
+    border-radius: 12px; font-size: 13px; font-weight: 700; letter-spacing: 2px; margin-top: 8px;
+  }
+  .save-indicator {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: #1A1A1A; border: 1px solid #2A2A2A;
+    padding: 8px 16px; border-radius: 20px;
+    font-size: 11px; color: #555; letter-spacing: 1px;
+    transition: opacity 0.5s; opacity: 0;
+  }
+  .save-indicator.show { opacity: 1; }
+  .user-setup {
+    position: fixed; inset: 0; background: #0D0D0D;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 24px; z-index: 100;
+  }
+  .user-setup h2 { font-family: 'Playfair Display', serif; font-size: 28px; letter-spacing: 4px; margin-bottom: 8px; }
+  .user-setup p { font-size: 12px; color: #555; letter-spacing: 1px; margin-bottom: 32px; text-align: center; }
+  .user-input {
+    width: 100%; padding: 14px 16px; background: #111;
+    border: 1px solid #2A2A2A; border-radius: 12px;
+    color: #F5F0E8; font-size: 16px; font-family: 'DM Sans', sans-serif;
+    margin-bottom: 12px; outline: none;
+  }
+  .user-input:focus { border-color: #E8572A; }
+  .start-btn {
+    width: 100%; padding: 16px; background: #E8572A; border: none;
+    border-radius: 12px; color: #fff; font-size: 14px;
+    font-weight: 700; letter-spacing: 2px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<!-- User Setup Screen -->
+<div class="user-setup" id="setup-screen">
+  <div style="font-family:'Playfair Display',serif;font-size:32px;letter-spacing:6px;color:#E8572A;margin-bottom:8px">FORGE</div>
+  <p>ENTER YOUR NAME TO SAVE<br>YOUR PROGRESS TO THE CLOUD</p>
+  <input class="user-input" id="name-input" type="text" placeholder="Your name or nickname" maxlength="30">
+  <button class="start-btn" onclick="startApp()">START TRAINING →</button>
+</div>
+
+<!-- Main App -->
+<div id="main-app" style="display:none">
+  <div class="header">
+    <div>
+      <div class="logo" id="logo">FORGE</div>
+      <div class="tagline">5-DAY STRENGTH</div>
+    </div>
+    <div>
+      <div class="streak-num">🔥 <span id="streak">0</span></div>
+      <div class="streak-label">DAY STREAK</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="row">
+      <span class="label">WEEKLY PROGRESS</span>
+      <span class="label" id="weekly-label">0/5 days</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="weekly-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="day-selector" id="day-selector"></div>
+
+  <div class="day-header">
+    <div class="row" style="align-items:flex-start">
+      <div>
+        <div class="day-focus" id="day-focus"></div>
+        <div class="day-tag" id="day-tag"></div>
+      </div>
+      <div style="text-align:right">
+        <div class="pct" id="pct">0%</div>
+        <div class="pct-label">COMPLETE</div>
+      </div>
+    </div>
+    <div class="progress-bar" style="margin-top:12px">
+      <div class="progress-fill" id="session-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div class="exercises" id="exercises"></div>
+</div>
+
+<div class="save-indicator" id="save-indicator">SAVED ✓</div>
+
+<script>
+const plan = [
+  {
+    day: "Monday", focus: "Push", tag: "Chest · Shoulders · Triceps", color: "#E8572A",
+    exercises: [
+      { name: "Dumbbell Bench Press", sets: 4, reps: "8–10", rest: "60s" },
+      { name: "Arnold Press", sets: 3, reps: "10–12", rest: "60s" },
+      { name: "Dumbbell Lateral Raise", sets: 3, reps: "12–15", rest: "45s" },
+      { name: "Tricep Overhead Extension (DB)", sets: 3, reps: "10–12", rest: "45s" },
+      { name: "Push-Up Burnout", sets: 2, reps: "Max", rest: "60s" },
+    ]
+  },
+  {
+    day: "Tuesday", focus: "Pull", tag: "Back · Biceps", color: "#3A7BD5",
+    exercises: [
+      { name: "Kettlebell Deadlift", sets: 4, reps: "8–10", rest: "75s" },
+      { name: "Dumbbell Bent-Over Row", sets: 4, reps: "8–10", rest: "60s" },
+      { name: "Kettlebell Swing", sets: 3, reps: "15", rest: "60s" },
+      { name: "Dumbbell Hammer Curl", sets: 3, reps: "10–12", rest: "45s" },
+      { name: "Renegade Row", sets: 3, reps: "8 each", rest: "60s" },
+    ]
+  },
+  {
+    day: "Wednesday", focus: "Legs", tag: "Quads · Hamstrings · Glutes", color: "#2ECC71",
+    exercises: [
+      { name: "Dumbbell Goblet Squat", sets: 4, reps: "10–12", rest: "75s" },
+      { name: "Kettlebell Romanian Deadlift", sets: 4, reps: "10", rest: "60s" },
+      { name: "Dumbbell Reverse Lunge", sets: 3, reps: "10 each", rest: "60s" },
+      { name: "Kettlebell Sumo Squat", sets: 3, reps: "12–15", rest: "45s" },
+      { name: "Glute Bridge (DB on hips)", sets: 3, reps: "15", rest: "45s" },
+    ]
+  },
+  {
+    day: "Thursday", focus: "Core + Cardio", tag: "Stability · Conditioning", color: "#9B59B6",
+    exercises: [
+      { name: "Kettlebell Turkish Get-Up", sets: 3, reps: "3 each", rest: "90s" },
+      { name: "DB Suitcase Carry", sets: 3, reps: "40 steps", rest: "45s" },
+      { name: "Plank with Shoulder Taps", sets: 3, reps: "20 taps", rest: "45s" },
+      { name: "Kettlebell Windmill", sets: 3, reps: "6 each", rest: "60s" },
+      { name: "Dead Bug", sets: 3, reps: "10 each", rest: "45s" },
+    ]
+  },
+  {
+    day: "Friday", focus: "Full Body", tag: "Compound · Power", color: "#E74C3C",
+    exercises: [
+      { name: "Kettlebell Clean & Press", sets: 4, reps: "6 each", rest: "75s" },
+      { name: "Dumbbell Thruster", sets: 3, reps: "10", rest: "60s" },
+      { name: "Single-Leg Deadlift (KB)", sets: 3, reps: "8 each", rest: "60s" },
+      { name: "Renegade Row to Push-Up", sets: 3, reps: "6 each", rest: "60s" },
+      { name: "KB Farmers Carry", sets: 3, reps: "50 steps", rest: "60s" },
+    ]
+  }
+];
+
+let activeDay = 0;
+let state = { completedSets: {}, completedDays: {}, streak: 0 };
+let userName = '';
+let saveTimer = null;
+
+// Use JSONBin.io as free cloud storage
+const BIN_API = 'https://api.jsonbin.io/v3/b';
+const API_KEY = '$2a$10$xb8siRRnAAoe.38pqmL8bugI9rN6n89yBndlBLITR50MDyZMR5Jcm';
+
+function getBinId() { return localStorage.getItem('forge_bin_id'); }
+function setBinId(id) { localStorage.setItem('forge_bin_id', id); }
+function getUser() { return localStorage.getItem('forge_user'); }
+function setUser(u) { localStorage.setItem('forge_user', u); }
+
+async function startApp() {
+  const name = document.getElementById('name-input').value.trim();
+  if (!name) { document.getElementById('name-input').focus(); return; }
+  userName = name;
+  setUser(name);
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  await loadFromCloud();
+  render();
+}
+
+async function saveToCloud() {
+  try {
+    const data = { user: userName, ...state, lastSaved: new Date().toISOString() };
+    const binId = getBinId();
+    if (binId) {
+      await fetch(`${BIN_API}/${binId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+        body: JSON.stringify(data)
+      });
+    } else {
+      const res = await fetch(BIN_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY, 'X-Bin-Name': `forge-${userName}` },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (json.metadata?.id) setBinId(json.metadata.id);
+    }
+    showSaved();
+  } catch(e) {
+    // Fall back to localStorage silently
+    localStorage.setItem('forge_state', JSON.stringify(state));
+    showSaved();
+  }
+}
+
+async function loadFromCloud() {
+  try {
+    const binId = getBinId();
+    if (binId) {
+      const res = await fetch(`${BIN_API}/${binId}/latest`, {
+        headers: { 'X-Master-Key': API_KEY }
+      });
+      const json = await res.json();
+      if (json.record) {
+        state.completedSets = json.record.completedSets || {};
+        state.completedDays = json.record.completedDays || {};
+        state.streak = json.record.streak || 0;
+        return;
+      }
+    }
+  } catch(e) {}
+  // Fall back to localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem('forge_state') || '{}');
+    state = { completedSets: saved.completedSets || {}, completedDays: saved.completedDays || {}, streak: saved.streak || 0 };
+  } catch(e) {}
+}
+
+function showSaved() {
+  const el = document.getElementById('save-indicator');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+function debounceSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveToCloud, 1000);
+}
+
+function totalSets(di) { return plan[di].exercises.reduce((a, e) => a + e.sets, 0); }
+function doneSets(di) {
+  let c = 0;
+  plan[di].exercises.forEach((ex, ei) => {
+    for (let s = 0; s < ex.sets; s++) if (state.completedSets[`${di}-${ei}-${s}`]) c++;
+  });
+  return c;
+}
+
+function render() {
+  const d = plan[activeDay];
+  const color = d.color;
+  const total = totalSets(activeDay);
+  const done = doneSets(activeDay);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const weeklyDone = Object.keys(state.completedDays).length;
+
+  document.getElementById('logo').style.color = color;
+  document.getElementById('streak').textContent = state.streak;
+  document.getElementById('weekly-label').style.color = color;
+  document.getElementById('weekly-label').textContent = `${weeklyDone}/5 days`;
+  document.getElementById('weekly-bar').style.width = `${(weeklyDone/5)*100}%`;
+  document.getElementById('weekly-bar').style.background = color;
+  document.getElementById('day-focus').textContent = d.focus;
+  document.getElementById('day-focus').style.color = color;
+  document.getElementById('day-tag').textContent = d.tag;
+  document.getElementById('pct').textContent = `${pct}%`;
+  document.getElementById('session-bar').style.width = `${pct}%`;
+  document.getElementById('session-bar').style.background = color;
+
+  document.getElementById('day-selector').innerHTML = plan.map((p, i) => `
+    <button class="day-btn" onclick="setDay(${i})"
+      style="background:${i === activeDay ? p.color : '#1A1A1A'};color:${i === activeDay ? '#fff' : state.completedDays[i] ? p.color : '#444'}">
+      ${p.day.slice(0,3).toUpperCase()}
+      ${state.completedDays[i] ? '<div class="day-check">✓</div>' : ''}
+    </button>
+  `).join('');
+
+  document.getElementById('exercises').innerHTML = d.exercises.map((e, ei) => {
+    const setsDone = Array.from({length: e.sets}).filter((_,s) => state.completedSets[`${activeDay}-${ei}-${s}`]).length;
+    return `
+      <div class="exercise-card">
+        <div class="ex-header">
+          <div>
+            <div class="ex-name">${e.name}</div>
+            <div class="ex-meta">${e.reps} reps · rest ${e.rest}</div>
+          </div>
+          <div class="ex-count" style="color:${color}">${setsDone}/${e.sets}</div>
+        </div>
+        <div class="sets-row">
+          ${Array.from({length: e.sets}).map((_,si) => {
+            const isDone = state.completedSets[`${activeDay}-${ei}-${si}`];
+            return `<button class="set-btn ${isDone?'done':''}" style="${isDone?`background:${color};border:none`:''}" onclick="toggleSet(${ei},${si})">${isDone?'✓':si+1}</button>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }).join('') + (
+    pct === 100 && !state.completedDays[activeDay]
+      ? `<button class="complete-btn" style="background:${color}" onclick="markDone()">✓ MARK DAY COMPLETE</button>`
+      : state.completedDays[activeDay]
+        ? `<div class="session-done" style="border:1px solid ${color}44;color:${color}">✓ SESSION COMPLETE</div>`
+        : ''
+  );
+}
+
+function setDay(i) { activeDay = i; render(); }
+
+function toggleSet(ei, si) {
+  const key = `${activeDay}-${ei}-${si}`;
+  state.completedSets[key] = !state.completedSets[key];
+  debounceSave(); render();
+}
+
+function markDone() {
+  state.completedDays[activeDay] = true;
+  state.streak++;
+  debounceSave(); render();
+}
+
+// Check if returning user
+const savedUser = getUser();
+if (savedUser) {
+  userName = savedUser;
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('main-app').style.display = 'block';
+  loadFromCloud().then(render);
+}
+</script>
+</body>
+</html>
